@@ -1,0 +1,6 @@
+Applications:
+    homox:
+        app_types:
+            - homoxApp
+        content_directory: ${ROOT_DIR}/doc/content
+        log_default: WARNING

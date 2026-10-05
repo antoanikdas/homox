@@ -1,0 +1,44 @@
+[Tests]
+  [homogeneous_kinematic]
+    type = CSVDiff
+    input = homogeneous_kinematic.i
+    cli_args = 'Outputs/exodus=false'
+    csvdiff = homogeneous_kinematic_out.csv
+    requirement = 'The application shall recover the exact homogeneous plane-strain response using its framework-only AD small-strain homogenization implementation.'
+  []
+  [homogeneous_mixed]
+    type = CSVDiff
+    input = homogeneous_kinematic.i
+    cli_args = "GlobalParams/constraint_types='strain none none stress stress none none none none' Outputs/exodus=false Outputs/file_base=homogeneous_mixed_out"
+    csvdiff = homogeneous_mixed_out.csv
+    requirement = 'The application shall enforce one average-strain and two average-stress constraints in a homogeneous plane-strain SVE.'
+  []
+  [homogeneous_static]
+    type = CSVDiff
+    input = homogeneous_kinematic.i
+    cli_args = "GlobalParams/constraint_types='stress none none stress stress none none none none' Functions/target_xx/expression=1 Outputs/exodus=false Outputs/file_base=homogeneous_static_out"
+    csvdiff = homogeneous_static_out.csv
+    requirement = 'The application shall enforce three average-stress constraints in a homogeneous plane-strain SVE.'
+  []
+  [nonperiodic_kinematic]
+    type = CSVDiff
+    input = nonperiodic_kinematic.i
+    cli_args = 'Outputs/exodus=false'
+    csvdiff = nonperiodic_kinematic_out.csv
+    requirement = 'The application shall solve a homogeneous SVE with a nonperiodic kinematic uniform boundary condition.'
+  []
+  [nonperiodic_mixed]
+    type = CSVDiff
+    input = nonperiodic_mixed.i
+    cli_args = 'Outputs/exodus=false'
+    csvdiff = nonperiodic_mixed_out.csv
+    requirement = 'The application shall solve a homogeneous SVE with nonperiodic mixed displacement and traction-free boundary conditions.'
+  []
+  [nonperiodic_static]
+    type = CSVDiff
+    input = nonperiodic_static.i
+    cli_args = 'Outputs/exodus=false'
+    csvdiff = nonperiodic_static_out.csv
+    requirement = 'The application shall solve a homogeneous SVE with a nonperiodic static uniform-traction boundary condition.'
+  []
+[]

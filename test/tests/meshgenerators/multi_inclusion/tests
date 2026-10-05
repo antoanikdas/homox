@@ -1,0 +1,9 @@
+[Tests]
+  [multi_inclusion_mesh]
+    type = RunApp
+    input = multi_inclusion.i
+    cli_args = '--mesh-only'
+    requirement = 'The application shall generate an asymmetric rectangular array of unit cells with conforming circular inclusions.'
+  []
+[]
+

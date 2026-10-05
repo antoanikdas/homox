@@ -197,6 +197,38 @@ The Mori-Tanaka discrepancy is expected because it represents an isolated circul
 inclusion embedded in a mean matrix field, whereas the numerical SVE contains a periodic or
 finite-boundary array of square inclusions.
 
+## Bulk and shear modulus comparison
+
+For the in-plane plane-strain matrix, define the two-dimensional areal bulk modulus and in-plane
+shear modulus as
+
+\[
+K^{2D}=\frac{C_{11}+C_{12}}{2},
+\qquad
+G_{xy}=C_{66}.
+\]
+
+Here, $K^{2D}$ relates the mean in-plane stress to the in-plane dilatation. It is not the
+three-dimensional bulk modulus, which cannot be recovered from this in-plane matrix alone without
+additional out-of-plane constitutive information.
+
+| Method | $K^{2D}$ | $G_{xy}$ |
+|---|---:|---:|
+| Matrix phase | 80.000000 | 40.000000 |
+| Inclusion phase | 800.000000 | 400.000000 |
+| Mori-Tanaka reference | 109.690722 | 57.245509 |
+| Periodic kinematic | 114.087132 | 54.221668 |
+| Periodic mixed | 114.087132 | 54.221668 |
+| Periodic static | 114.087132 | 54.221668 |
+| Nonperiodic kinematic | 114.514747 | 58.239285 |
+| Nonperiodic mixed | 114.923724 | 54.221668 |
+| Nonperiodic static | 113.925239 | 53.232150 |
+
+The antiplane study of the same extruded microstructure gives
+$G_{xz}=G_{yz}=61.990661$ for all periodic formulations. This differs from
+$G_{xy}=54.221668$, which is permissible because the extruded square-inclusion composite is
+transversely isotropic rather than fully isotropic.
+
 ## Reference
 
 The plane-strain cylindrical-inclusion concentration factors and Mori-Tanaka form follow

@@ -2,5 +2,7 @@
 
 # homoxApp
 
-`homox` contains a framework-only [small-strain homogenization](source/homogenization.md)
-implementation. The optional MOOSE Solid Mechanics module remains disabled.
+`homox` contains framework-only implementations of
+[in-plane small-strain homogenization](source/homogenization.md) and
+[antiplane homogenization](source/antiplane_homogenization.md). The optional MOOSE Solid
+Mechanics module remains disabled.

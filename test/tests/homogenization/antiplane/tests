@@ -1,0 +1,44 @@
+[Tests]
+  [periodic_kinematic]
+    type = CSVDiff
+    input = periodic_kinematic.i
+    cli_args = 'Outputs/exodus=false'
+    csvdiff = periodic_kinematic_out.csv
+    requirement = 'The application shall homogenize antiplane elasticity with periodic average-strain constraints.'
+  []
+  [periodic_mixed]
+    type = CSVDiff
+    input = periodic_mixed.i
+    cli_args = 'Outputs/exodus=false'
+    csvdiff = periodic_mixed_out.csv
+    requirement = 'The application shall homogenize antiplane elasticity with periodic mixed average constraints.'
+  []
+  [periodic_static]
+    type = CSVDiff
+    input = periodic_static.i
+    cli_args = 'Outputs/exodus=false'
+    csvdiff = periodic_static_out.csv
+    requirement = 'The application shall homogenize antiplane elasticity with periodic average-stress constraints.'
+  []
+  [nonperiodic_kinematic]
+    type = CSVDiff
+    input = nonperiodic_kinematic.i
+    cli_args = 'Outputs/exodus=false'
+    csvdiff = nonperiodic_kinematic_out.csv
+    requirement = 'The application shall solve antiplane homogenization with a nonperiodic affine boundary condition.'
+  []
+  [nonperiodic_mixed]
+    type = CSVDiff
+    input = nonperiodic_mixed.i
+    cli_args = 'Outputs/exodus=false'
+    csvdiff = nonperiodic_mixed_out.csv
+    requirement = 'The application shall solve antiplane homogenization with nonperiodic mixed boundary conditions.'
+  []
+  [nonperiodic_static]
+    type = CSVDiff
+    input = nonperiodic_static.i
+    cli_args = 'Outputs/exodus=false'
+    csvdiff = nonperiodic_static_out.csv
+    requirement = 'The application shall solve antiplane homogenization with nonperiodic uniform-traction boundary conditions.'
+  []
+[]

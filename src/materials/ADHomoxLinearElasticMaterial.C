@@ -1,5 +1,9 @@
 #include "ADHomoxLinearElasticMaterial.h"
 
+#include "SymmetricRankFourTensor.h"
+
+#include <Eigen/Cholesky>
+
 registerMooseObject("homoxApp", ADHomoxLinearElasticMaterial);
 
 InputParameters
@@ -46,9 +50,23 @@ ADHomoxLinearElasticMaterial::ADHomoxLinearElasticMaterial(const InputParameters
     _stiffness.fillSymmetricIsotropicEandNu(E, nu);
   }
   else
+  {
     _stiffness.fillFromInputVector(
         getParam<std::vector<Real>>("C_ijkl"),
         static_cast<RankFourTensor::FillMethod>(int(getParam<MooseEnum>("fill_method"))));
+
+    if (!_stiffness.isSymmetric())
+      paramError("C_ijkl", "The elasticity tensor must have minor and major symmetry.");
+
+    const SymmetricRankFourTensor mandel_stiffness(_stiffness);
+    RealEigenMatrix matrix(6, 6);
+    for (const auto i : make_range(6))
+      for (const auto j : make_range(6))
+        matrix(i, j) = mandel_stiffness(i, j);
+
+    if (matrix.llt().info() != Eigen::Success)
+      paramError("C_ijkl", "The symmetric elasticity tensor must be positive definite.");
+  }
 }
 
 void

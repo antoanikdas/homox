@@ -33,6 +33,11 @@ ADHomoxHomogenization::ADHomoxHomogenization(const InputParameters & parameters)
 {
   if (_component >= _ndisp)
     paramError("component", "The component must be smaller than the displacement count.");
+  if (_compute_scalar_residuals != (_component == 0))
+    paramError("compute_scalar_residuals",
+               "Only the component-zero kernel may assemble the macroscopic scalar equations; "
+               "set this parameter to true for component zero and false for every other "
+               "component.");
   if (_k_order != constraintMap().size())
     paramError("scalar_variable",
                "Its order must equal the number of active homogenization constraints (",

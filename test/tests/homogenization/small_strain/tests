@@ -43,6 +43,84 @@
     cli_args = 'Outputs/csv=false Outputs/exodus=false'
     requirement = 'The heterogeneous anisotropic homogenization system shall provide a consistent field-scalar Jacobian.'
   []
+  [nonsymmetric_stiffness]
+    type = RunException
+    input = heterogeneous_anisotropic.i
+    cli_args = "Materials/matrix/fill_method=antisymmetric Materials/matrix/C_ijkl='1 1 1 1 1 1'"
+    expect_err = 'The elasticity tensor must have minor and major symmetry'
+    requirement = 'The linear-elastic material shall reject a stiffness tensor without elastic symmetry.'
+  []
+  [unstable_stiffness]
+    type = RunException
+    input = heterogeneous_anisotropic.i
+    cli_args = "Materials/matrix/C_ijkl='200 50 40 0 0 12 120 30 0 0 -8 150 0 0 0 45 10 0 70 0 -60'"
+    expect_err = 'The symmetric elasticity tensor must be positive definite'
+    requirement = 'The linear-elastic material shall reject a symmetric but unstable stiffness tensor.'
+  []
+  [invalid_scalar_owner_zero]
+    type = RunException
+    input = homogeneous_kinematic.i
+    cli_args = 'Kernels/equilibrium_x/compute_scalar_residuals=false'
+    expect_err = 'Only the component-zero kernel may assemble the macroscopic scalar equations'
+    requirement = 'The component-zero homogenization kernel shall be required to own the macroscopic scalar equations.'
+  []
+  [invalid_scalar_owner_nonzero]
+    type = RunException
+    input = homogeneous_kinematic.i
+    cli_args = 'Kernels/equilibrium_y/compute_scalar_residuals=true'
+    expect_err = 'Only the component-zero kernel may assemble the macroscopic scalar equations'
+    requirement = 'A nonzero-component homogenization kernel shall not assemble duplicate macroscopic scalar equations.'
+  []
+  [homogeneous_3d_xx]
+    type = CSVDiff
+    input = homogeneous_3d.i
+    csvdiff = homogeneous_3d_xx_out.csv
+    requirement = 'The application shall recover the xx column of a homogeneous three-dimensional isotropic stiffness.'
+  []
+  [homogeneous_3d_yy]
+    type = CSVDiff
+    input = homogeneous_3d.i
+    cli_args = 'Functions/target_xx/expression=0 Functions/target_yy/expression=0.01 Outputs/file_base=homogeneous_3d_yy_out'
+    csvdiff = homogeneous_3d_yy_out.csv
+    requirement = 'The application shall recover the yy column of a homogeneous three-dimensional isotropic stiffness.'
+  []
+  [homogeneous_3d_zz]
+    type = CSVDiff
+    input = homogeneous_3d.i
+    cli_args = 'Functions/target_xx/expression=0 Functions/target_zz/expression=0.01 Outputs/file_base=homogeneous_3d_zz_out'
+    csvdiff = homogeneous_3d_zz_out.csv
+    requirement = 'The application shall recover the zz column of a homogeneous three-dimensional isotropic stiffness.'
+  []
+  [homogeneous_3d_xy]
+    type = CSVDiff
+    input = homogeneous_3d.i
+    cli_args = 'Functions/target_xx/expression=0 Functions/target_xy/expression=0.005 Outputs/file_base=homogeneous_3d_xy_out'
+    csvdiff = homogeneous_3d_xy_out.csv
+    requirement = 'The application shall recover the xy engineering-shear column of a homogeneous three-dimensional isotropic stiffness.'
+  []
+  [homogeneous_3d_xz]
+    type = CSVDiff
+    input = homogeneous_3d.i
+    cli_args = 'Functions/target_xx/expression=0 Functions/target_xz/expression=0.005 Outputs/file_base=homogeneous_3d_xz_out'
+    csvdiff = homogeneous_3d_xz_out.csv
+    requirement = 'The application shall recover the xz engineering-shear column of a homogeneous three-dimensional isotropic stiffness.'
+  []
+  [homogeneous_3d_yz]
+    type = CSVDiff
+    input = homogeneous_3d.i
+    cli_args = 'Functions/target_xx/expression=0 Functions/target_yz/expression=0.005 Outputs/file_base=homogeneous_3d_yz_out'
+    csvdiff = homogeneous_3d_yz_out.csv
+    requirement = 'The application shall recover the yz engineering-shear column of a homogeneous three-dimensional isotropic stiffness.'
+  []
+  [homogeneous_3d_jacobian]
+    type = PetscJacobianTester
+    input = homogeneous_3d.i
+    run_sim = true
+    ratio_tol = 1e-7
+    difference_tol = 1e-5
+    cli_args = 'Outputs/csv=false'
+    requirement = 'The three-dimensional homogenization system shall provide a consistent field-scalar Jacobian.'
+  []
   [nonperiodic_kinematic]
     type = CSVDiff
     input = nonperiodic_kinematic.i

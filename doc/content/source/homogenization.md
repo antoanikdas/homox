@@ -50,6 +50,14 @@ The materials supplied by `homox` are linear elastic, so this tangent is their s
 future nonlinear constitutive material must provide its algorithmically consistent tangent under
 the same property name.
 
+For a user-supplied `C_ijkl`, `ADHomoxLinearElasticMaterial` requires minor and major elastic
+symmetry and positive definiteness in six-dimensional Mandel form. Invalid tensors are rejected
+during input construction rather than being passed to the nonlinear solve.
+
+The displacement kernel with `component = 0` owns the macroscopic scalar equations and must use
+`compute_scalar_residuals = true`. Kernels for every other displacement component must set it to
+`false`; the application validates this division of assembly responsibility.
+
 The implementation consists of:
 
 - `ADHomoxSmallStrain`: fluctuation plus macroscopic infinitesimal strain;
@@ -62,6 +70,27 @@ The implementation consists of:
 The example `examples/small_strain_homogenization/homogeneous_kinematic.i` is a periodic,
 homogeneous plane-strain verification problem. General anisotropy is selected with `C_ijkl` and
 `fill_method`; isotropy is selected with `youngs_modulus` and `poissons_ratio`.
+
+## Three-dimensional verification
+
+The regression input `test/tests/homogenization/small_strain/homogeneous_3d.i` applies six
+independent periodic loading cases to a homogeneous cube. For `E = 100` and `nu = 0.25`, it
+recovers the engineering-shear matrix
+
+\[
+\mathbf C_{6\times6}=
+\begin{bmatrix}
+120&40&40&0&0&0\\
+40&120&40&0&0&0\\
+40&40&120&0&0&0\\
+0&0&0&40&0&0\\
+0&0&0&0&40&0\\
+0&0&0&0&0&40
+\end{bmatrix}.
+\]
+
+The associated PETSc finite-difference check verifies the complete field-scalar Jacobian for the
+six macroscopic strain unknowns.
 
 ## Boundary-condition families
 

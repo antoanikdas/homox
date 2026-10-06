@@ -39,3 +39,7 @@ The reconstructed values match the detailed result files at their reported six-d
 
 The remaining four basic small-strain examples also converged and provide direct homogeneous and
 nonperiodic formulation checks, but they do not define an additional effective-matrix study.
+
+The automated regression suite additionally contains six independent three-dimensional periodic
+load cases. A homogeneous material with `E = 100` and `nu = 0.25` recovers normal stiffness 120,
+normal coupling 40, and all three engineering shear moduli equal to 40.

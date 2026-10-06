@@ -11,17 +11,23 @@
     inclusion_rings = 6
     matrix_rings = 8
   []
+  [position_domain]
+    type = TransformGenerator
+    input = unit_cells
+    transform = TRANSLATE
+    vector_value = '0.5 0.5 0'
+  []
   [pin_origin]
     type = ExtraNodesetGenerator
-    input = unit_cells
+    input = position_domain
     new_boundary = pin_origin
-    coord = '-0.5 -0.5 0'
+    coord = '0 0 0'
   []
   [pin_x]
     type = ExtraNodesetGenerator
     input = pin_origin
     new_boundary = pin_x
-    coord = '1.5 -0.5 0'
+    coord = '2 0 0'
   []
 []
 

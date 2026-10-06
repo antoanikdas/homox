@@ -18,8 +18,16 @@ This study contains two identical circular-inclusion unit cells arranged as a $2
 []
 ```
 
-The complete domain has width two and height one. Each unit cell contains a 25% circular
-inclusion. The anisotropic phase properties are identical to the one-cell and $2\times2$ studies.
+The assembled cell array is translated by $(0.5,0.5)$, giving the physical limits
+
+\[
+x_{\min}=0,\qquad x_{\max}=2,\qquad
+y_{\min}=0,\qquad y_{\max}=1.
+\]
+
+The complete domain therefore has width two and height one, with inclusion centers at $(0.5,0.5)$
+and $(1.5,0.5)$. Each unit cell contains a 25% circular inclusion. The anisotropic phase
+properties are identical to the one-cell and $2\times2$ studies.
 
 The x-directed mixed displacement jumps are doubled relative to a single cell because the domain
 width is two. The y-directed and shear jumps retain the one-cell scaling because the domain height
@@ -94,4 +102,3 @@ $\mathbf C^{\mathrm{NK}}-\mathbf C^{\mathrm{periodic}}$ are
 $(0.3421,0.4858,1.2036)$ and those of
 $\mathbf C^{\mathrm{periodic}}-\mathbf C^{\mathrm{NS}}$ are $(0.3078,0.3570,5.8151)$.
 The corresponding antiplane eigenvalues are $(0.0638,0.2112)$ and $(0.0334,0.4301)$.
-

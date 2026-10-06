@@ -20,6 +20,29 @@
     csvdiff = homogeneous_static_out.csv
     requirement = 'The application shall enforce three average-stress constraints in a homogeneous plane-strain SVE.'
   []
+  [duplicate_symmetric_constraint]
+    type = RunException
+    input = homogeneous_kinematic.i
+    cli_args = "GlobalParams/constraint_types='strain strain none strain strain none none none none' GlobalParams/targets='target_xx target_xy target_xy target_yy' Variables/macro_strain/order=FOURTH"
+    expect_err = 'cannot both be constrained because strain and stress are symmetric'
+    requirement = 'The application shall reject duplicate macroscopic unknowns for symmetric off-diagonal tensor components.'
+  []
+  [heterogeneous_anisotropic]
+    type = CSVDiff
+    input = heterogeneous_anisotropic.i
+    cli_args = 'Outputs/exodus=false'
+    csvdiff = heterogeneous_anisotropic_out.csv
+    requirement = 'The application shall homogenize a heterogeneous anisotropic SVE with normal-shear coupling.'
+  []
+  [heterogeneous_anisotropic_jacobian]
+    type = PetscJacobianTester
+    input = heterogeneous_anisotropic.i
+    run_sim = true
+    ratio_tol = 1e-7
+    difference_tol = 1e-5
+    cli_args = 'Outputs/csv=false Outputs/exodus=false'
+    requirement = 'The heterogeneous anisotropic homogenization system shall provide a consistent field-scalar Jacobian.'
+  []
   [nonperiodic_kinematic]
     type = CSVDiff
     input = nonperiodic_kinematic.i

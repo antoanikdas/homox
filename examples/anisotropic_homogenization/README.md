@@ -1,5 +1,9 @@
 # Homogeneous Anisotropic Homogenization Verification
 
+The results in this file were reproduced from the refreshed CSV outputs for all 30 in-plane and
+antiplane load cases. Every solve converged, and the matrices were reconstructed from the final
+volume-averaged strain and stress values.
+
 These cases verify that all periodic and nonperiodic formulations recover a prescribed homogeneous
 anisotropic stiffness. The material is deliberately coupled rather than merely diagonal.
 
@@ -108,4 +112,3 @@ All methods recover the prescribed matrices to floating-point precision.
 The agreement confirms that the in-plane fourth-order tensor path and the antiplane symmetric
 $2\times2$ tensor path both preserve anisotropy and coupling under every implemented boundary
 formulation.
-

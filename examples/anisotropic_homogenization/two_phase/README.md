@@ -1,5 +1,9 @@
 # Two-Phase Anisotropic Homogenization
 
+The results in this file were reproduced from the refreshed CSV outputs for all 30 in-plane and
+antiplane load cases. Every solve converged, and each effective matrix was reconstructed from the
+final volume-averaged strain and stress values.
+
 ## Problem
 
 The unit-square SVE contains a centered square inclusion occupying 25% of the area. Both phases
@@ -141,4 +145,3 @@ with eigenvalues $(0.3370,0.7548,1.8267)$ and $(0.1131,0.5030,8.7113)$, respecti
 antiplane loading, the corresponding eigenvalues are $(0.0972,0.4429)$ and $(0.0145,0.5771)$.
 Thus both formulations retain the expected nonperiodic kinematic upper bound and static lower
 bound for this anisotropic two-phase SVE.
-

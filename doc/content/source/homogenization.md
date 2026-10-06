@@ -38,6 +38,18 @@ or
 \int_\Omega (\sigma_{ij}-\sigma_{ij}^{\mathrm{target}})\,dV=0.
 \]
 
+Because infinitesimal strain and Cauchy stress are symmetric, only one member of each off-diagonal
+pair may be active: for example, constrain `xy` or `yx`, but not both. The kernel uses the material
+property `elasticity_tensor` as the consistent derivative
+
+\[
+C_{ijkl}^{\mathrm{tan}}=\frac{\partial\sigma_{ij}}{\partial\epsilon_{kl}}.
+\]
+
+The materials supplied by `homox` are linear elastic, so this tangent is their stiffness tensor. A
+future nonlinear constitutive material must provide its algorithmically consistent tangent under
+the same property name.
+
 The implementation consists of:
 
 - `ADHomoxSmallStrain`: fluctuation plus macroscopic infinitesimal strain;

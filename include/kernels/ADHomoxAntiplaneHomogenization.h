@@ -4,7 +4,7 @@
 #include "HomoxAntiplaneHomogenizationInterface.h"
 #include "RankTwoTensor.h"
 
-/** Antiplane equilibrium kernel with volume-average gradient/stress constraints. */
+/** Linear-elastic antiplane equilibrium kernel with volume-average gradient/stress constraints. */
 class ADHomoxAntiplaneHomogenization
   : public HomoxAntiplaneHomogenizationInterface<ADKernelScalarBase>
 {
@@ -28,5 +28,6 @@ protected:
   const std::string _base_name;
   const ADMaterialProperty<RealVectorValue> & _antiplane_stress;
   const ADMaterialProperty<RealVectorValue> & _antiplane_strain;
+  /// Consistent derivative of antiplane stress with respect to antiplane strain
   const ADMaterialProperty<RankTwoTensor> & _antiplane_stiffness;
 };

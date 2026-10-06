@@ -1,5 +1,9 @@
 # Circular-Inclusion Two-Phase Anisotropic Homogenization
 
+The results in this file were reproduced from the refreshed CSV outputs for all 30 in-plane and
+antiplane load cases. Every solve converged, and each effective matrix was reconstructed from the
+final volume-averaged strain and stress values.
+
 ## Problem
 
 The unit-square SVE contains a centered circular inclusion with radius
@@ -115,4 +119,3 @@ properties and inclusion fraction are unchanged.
 
 The complete periodic matrices differ by 0.823% in relative Frobenius norm in-plane and 0.733%
 in antiplane response.
-

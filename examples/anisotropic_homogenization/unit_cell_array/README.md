@@ -1,5 +1,9 @@
 # Four-Unit-Cell Anisotropic Homogenization
 
+The results in this file were reproduced from the refreshed CSV outputs for all 30 in-plane and
+antiplane load cases. Every solve converged, and each effective matrix was reconstructed from the
+final volume-averaged strain and stress values.
+
 ## Geometry
 
 This study contains four identical circular-inclusion unit cells arranged as a $2\times2$ array.
@@ -107,4 +111,3 @@ eigenvalues of $\mathbf C^{\mathrm{NK}}-\mathbf C^{\mathrm{periodic}}$ are
 $(0.2012,0.4079,0.8545)$, while those of
 $\mathbf C^{\mathrm{periodic}}-\mathbf C^{\mathrm{NS}}$ are $(0.2104,0.2599,4.2594)$.
 The corresponding antiplane eigenvalues are $(0.0344,0.1958)$ and $(0.0188,0.3816)$.
-

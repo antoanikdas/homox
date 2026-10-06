@@ -48,6 +48,11 @@ either
 \langle\tau_i\rangle=\tau_i^{\mathrm{target}}.
 \]
 
+The periodic kernel uses `antiplane_stiffness` as the consistent derivative
+\(\partial\boldsymbol\tau/\partial\boldsymbol\gamma\). It is the constant stiffness matrix for the
+linear-elastic materials supplied here. Any future nonlinear antiplane material must expose its
+algorithmically consistent tangent under that property name.
+
 ## Application objects
 
 - `ADHomoxAntiplaneStrain`: periodic fluctuation gradient plus macroscopic gradient;

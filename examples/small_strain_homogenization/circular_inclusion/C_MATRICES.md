@@ -1,5 +1,9 @@
 # Circular-Inclusion In-Plane Homogenization
 
+The matrices in this file were reproduced from the refreshed CSV outputs for all 18 in-plane load
+cases. Every solve converged, and each effective matrix was reconstructed from the final
+volume-averaged strain and stress values.
+
 ## Problem
 
 The unit-square SVE contains a centered circular inclusion with radius
@@ -92,4 +96,3 @@ Mori-Tanaka represents an isolated circular cylindrical inclusion in a matrix me
 numerical SVE instead represents a finite or periodically repeated circular-inclusion cell, so
 exact equality is not expected. The periodic tensor differs from the Mori-Tanaka tensor by
 3.193% in Frobenius norm.
-

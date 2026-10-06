@@ -1,5 +1,9 @@
 # Multiple-Inclusion Homogenization
 
+The verified matrices in this file were reproduced from the refreshed CSV outputs for all five
+periodic load cases. Every solve converged, and the in-plane and antiplane matrices were
+reconstructed from the final volume-averaged strain and stress values.
+
 `HomoxMultiInclusionMeshGenerator` creates a rectangular array of unit-square cells. Every cell
 contains one centered, conforming circular inclusion. The central cell remains centered at the
 coordinate origin.
@@ -63,4 +67,3 @@ Here the in-plane matrix uses engineering shear, so $C_{66}=G_{xy}$. The $3\time
 single-cell run give the same reported components to machine precision, as expected for identical
 periodically repeated cells. An asymmetric $3\times2$ array with `n_left = 2`, `n_right = 0`,
 `n_top = 1`, and `n_bottom = 0` was also run successfully.
-

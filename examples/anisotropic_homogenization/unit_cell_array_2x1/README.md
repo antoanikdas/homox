@@ -1,5 +1,9 @@
 # Two-Unit-Cell Anisotropic Homogenization
 
+The results in this file were reproduced from the refreshed CSV outputs for all 30 in-plane and
+antiplane load cases. Every solve converged, and each effective matrix was reconstructed from the
+final volume-averaged strain and stress values.
+
 ## Geometry
 
 This study contains two identical circular-inclusion unit cells arranged as a $2\times1$ array:

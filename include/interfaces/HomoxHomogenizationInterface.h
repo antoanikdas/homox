@@ -75,6 +75,19 @@ HomoxHomogenizationInterface<T>::HomoxHomogenizationInterface(const InputParamet
       if (target >= target_names.size())
         this->paramError("targets", "A target is required for every non-none constraint.");
 
+      if (i != j && _constraint_map.count({j, i}))
+        this->paramError(
+            "constraint_types",
+            "Tensor components (",
+            i,
+            ", ",
+            j,
+            ") and (",
+            j,
+            ", ",
+            i,
+            ") cannot both be constrained because strain and stress are symmetric.");
+
       _constraint_map[{i, j}] = {type, &this->getFunctionByName(target_names[target++])};
     }
 

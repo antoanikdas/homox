@@ -1,5 +1,9 @@
 # Two-Phase Antiplane Homogenization Matrices
 
+The matrices in this file were reproduced from the refreshed CSV outputs for all 12 antiplane load
+cases. Every solve converged, and each effective matrix was reconstructed from the final
+volume-averaged shear strain and stress values.
+
 ## Problem
 
 The unit-square SVE contains a centered square inclusion occupying 25% of the area. The phase

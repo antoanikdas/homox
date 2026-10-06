@@ -11,7 +11,9 @@ ADHomoxHomogenization::validParams()
 {
   InputParameters params = HomoxHomogenizationInterface<ADKernelScalarBase>::validParams();
   params.addClassDescription(
-      "Small-strain stress divergence with volume-average strain/stress constraints.");
+      "Linear-elastic small-strain stress divergence with volume-average strain/stress "
+      "constraints. The elasticity_tensor material property must be the consistent derivative of "
+      "stress with respect to mechanical strain.");
   params.addRequiredParam<unsigned int>("component", "Displacement equation component");
   params.addRequiredCoupledVar("displacements", "Displacement fluctuation variables");
   params.addParam<std::string>("base_name", "Optional material property prefix");
@@ -151,7 +153,10 @@ ADHomoxHomogenization::computeScalarJacobianManual()
           if (constraint.first == HomoxHomogenization::ConstraintType::Stress)
             for (unsigned int n = 0; n < _ndisp; ++n)
               _local_ke(row, _j) +=
-                  dV * raw_value(_elasticity_tensor[_qp](i, j, d, n)) * grad_phi[_j][_qp](n);
+                  0.5 * dV *
+                  raw_value(_elasticity_tensor[_qp](i, j, d, n) +
+                            _elasticity_tensor[_qp](i, j, n, d)) *
+                  grad_phi[_j][_qp](n);
           else
             _local_ke(row, _j) +=
                 0.5 * dV *

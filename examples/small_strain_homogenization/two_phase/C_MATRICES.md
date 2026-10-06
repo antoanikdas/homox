@@ -1,5 +1,9 @@
 # Two-Phase Effective Stiffness Matrices
 
+The matrices in this file were reproduced from the refreshed CSV outputs for all 18 in-plane load
+cases. Every solve converged, and each effective matrix was reconstructed from the final
+volume-averaged strain and stress values.
+
 ## Problem definition
 
 The SVE is a unit square containing a centered square inclusion. The generated mesh has 256

@@ -1,9 +1,11 @@
 [Tests]
   [multi_inclusion_mesh]
-    type = RunApp
+    type = Exodiff
     input = multi_inclusion.i
     cli_args = '--mesh-only'
-    requirement = 'The application shall generate an asymmetric rectangular array of unit cells with conforming circular inclusions.'
+    exodiff = multi_inclusion_in.e
+    exodiff_opts = '-pedantic -match_by_name'
+    recover = false
+    requirement = 'The application shall generate the expected asymmetric rectangular mesh, phase blocks, exterior boundaries, and corner node sets.'
   []
 []
-

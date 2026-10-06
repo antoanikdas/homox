@@ -12,7 +12,9 @@ ADHomoxAntiplaneHomogenization::validParams()
   InputParameters params =
       HomoxAntiplaneHomogenizationInterface<ADKernelScalarBase>::validParams();
   params.addClassDescription(
-      "Antiplane stress divergence with volume-average gradient/stress constraints.");
+      "Linear-elastic antiplane stress divergence with volume-average gradient/stress constraints. "
+      "The antiplane_stiffness material property must be the consistent derivative of stress with "
+      "respect to strain.");
   params.addParam<std::string>("base_name", "Optional material property prefix");
   params.set<bool>("use_displaced_mesh") = false;
   return params;

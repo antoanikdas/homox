@@ -1,5 +1,9 @@
 # Circular-Inclusion Antiplane Homogenization
 
+The matrices in this file were reproduced from the refreshed CSV outputs for all 12 antiplane load
+cases. Every solve converged, and each effective matrix was reconstructed from the final
+volume-averaged shear strain and stress values.
+
 ## Problem
 
 The geometry is the same unit-square SVE and conforming circular inclusion used by the in-plane
@@ -81,4 +85,3 @@ The finite-SVE ordering is
 
 The periodic result lies close to Mori-Tanaka because both describe a circular-inclusion problem,
 although the periodic cell and mean-field models are not identical.
-

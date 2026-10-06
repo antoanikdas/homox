@@ -13,6 +13,15 @@
     csvdiff = periodic_mixed_out.csv
     requirement = 'The application shall homogenize antiplane elasticity with periodic mixed average constraints.'
   []
+  [periodic_mixed_jacobian]
+    type = PetscJacobianTester
+    input = periodic_mixed.i
+    run_sim = true
+    ratio_tol = 1e-7
+    difference_tol = 1e-5
+    cli_args = 'Outputs/csv=false Outputs/exodus=false'
+    requirement = 'The heterogeneous antiplane homogenization system shall provide a consistent field-scalar Jacobian.'
+  []
   [periodic_static]
     type = CSVDiff
     input = periodic_static.i

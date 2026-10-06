@@ -5,7 +5,7 @@
 #include "RankFourTensor.h"
 #include "RankTwoTensor.h"
 
-/** Equilibrium kernel with volume-average strain/stress constraints. */
+/** Linear-elastic equilibrium kernel with volume-average strain/stress constraints. */
 class ADHomoxHomogenization : public HomoxHomogenizationInterface<ADKernelScalarBase>
 {
 public:
@@ -28,6 +28,7 @@ protected:
   const std::string _base_name;
   const ADMaterialProperty<RankTwoTensor> & _stress;
   const ADMaterialProperty<RankTwoTensor> & _mechanical_strain;
+  /// Consistent derivative of stress with respect to mechanical strain
   const ADMaterialProperty<RankFourTensor> & _elasticity_tensor;
   const unsigned int _component;
   const unsigned int _ndisp;

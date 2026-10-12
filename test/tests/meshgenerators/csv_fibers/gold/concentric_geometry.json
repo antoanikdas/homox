@@ -1,0 +1,54 @@
+{
+    "reporters": {
+        "geometry": {
+            "type": "MeshMetaDataReporter",
+            "values": {
+                "values": {
+                    "type": "std::map<std::string, RestartableDataReporter::Value>"
+                }
+            }
+        }
+    },
+    "time_steps": [
+        {
+            "geometry": {
+                "values": {
+                    "MeshMetaData/rve/fiber_centers": {
+                        "value": [
+                            {
+                                "x": 0.02,
+                                "y": 0.03,
+                                "z": 0.0
+                            },
+                            {
+                                "x": 0.96,
+                                "y": 0.6,
+                                "z": 0.0
+                            },
+                            {
+                                "x": 0.5,
+                                "y": 0.98,
+                                "z": 0.0
+                            },
+                            {
+                                "x": 0.45,
+                                "y": 0.45,
+                                "z": 0.0
+                            }
+                        ]
+                    },
+                    "MeshMetaData/rve/fiber_radii": {
+                        "value": [
+                            0.08,
+                            0.06,
+                            0.1,
+                            0.12
+                        ]
+                    }
+                }
+            },
+            "time": 0.0,
+            "time_step": 0
+        }
+    ]
+}

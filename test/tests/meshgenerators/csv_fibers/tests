@@ -1,0 +1,101 @@
+[Tests]
+  [concentric]
+    type = Exodiff
+    input = mesh.i
+    cli_args = '--mesh-only concentric.e'
+    exodiff = concentric.e
+    recover = false
+    requirement = 'CSV centers and individual radii shall generate a fitted periodic all-triangle mesh.'
+  []
+  [structured]
+    type = Exodiff
+    input = mesh.i
+    cli_args = '--mesh-only structured.e Mesh/rve/mesh_type=structured'
+    exodiff = structured.e
+    recover = false
+    requirement = 'CSV centers and individual radii shall generate a structured periodic mesh.'
+  []
+  [concentric_geometry]
+    type = JSONDiff
+    input = geometry.i
+    cli_args = 'Outputs/file_base=concentric_geometry'
+    jsondiff = concentric_geometry.json
+    requirement = 'The fitted mesh shall retain the exact CSV centers and radii as metadata.'
+  []
+  [structured_geometry]
+    type = JSONDiff
+    input = geometry.i
+    cli_args = 'Mesh/rve/mesh_type=structured Outputs/file_base=structured_geometry'
+    jsondiff = structured_geometry.json
+    requirement = 'The structured mesh shall retain the same exact CSV centers and radii as the fitted mesh.'
+  []
+  [conflicting_input]
+    type = RunException
+    input = mesh.i
+    cli_args = '--mesh-only conflicting.e Mesh/rve/radius=0.08'
+    expect_err = 'Do not also specify radius'
+    requirement = 'CSV geometry shall reject conflicting random-placement parameters.'
+  []
+  [direct_concentric]
+    type = Exodiff
+    input = mesh.i
+    cli_args = '--mesh-only direct_concentric.e Mesh/rve/type=HomoxRandomConcentricFiberMeshGenerator'
+    exodiff = direct_concentric.e
+    recover = false
+    allow_unused = true
+    requirement = 'The direct fitted generator shall accept CSV geometry without the RVE wrapper.'
+  []
+  [direct_structured]
+    type = Exodiff
+    input = mesh.i
+    cli_args = '--mesh-only direct_structured.e Mesh/rve/type=HomoxRandomFiberMeshGenerator Mesh/rve/matrix_block_id=2'
+    exodiff = direct_structured.e
+    recover = false
+    allow_unused = true
+    requirement = 'The direct structured generator shall accept CSV geometry without the RVE wrapper.'
+  []
+  [interior_concentric]
+    type = Exodiff
+    input = mesh.i
+    cli_args = '--mesh-only interior_concentric.e Mesh/rve/periodic_geometry=false Mesh/rve/inclusions_file=gold/interior.csv'
+    exodiff = interior_concentric.e
+    recover = false
+    requirement = 'CSV geometry shall also support nonperiodic fitted meshes with interior fibers.'
+  []
+  [interior_structured]
+    type = Exodiff
+    input = mesh.i
+    cli_args = '--mesh-only interior_structured.e Mesh/rve/mesh_type=structured Mesh/rve/periodic_geometry=false Mesh/rve/inclusions_file=gold/interior.csv'
+    exodiff = interior_structured.e
+    recover = false
+    requirement = 'CSV geometry shall also support nonperiodic structured meshes with interior fibers.'
+  []
+  [invalid_header]
+    type = RunException
+    input = mesh.i
+    cli_args = '--mesh-only invalid_header.e Mesh/rve/inclusions_file=gold/invalid_header.csv'
+    expect_err = 'CSV must have exactly the headers x,y,radius'
+    requirement = 'CSV geometry shall reject files with unsupported column names.'
+  []
+  [outside_domain]
+    type = RunException
+    input = mesh.i
+    cli_args = '--mesh-only outside.e Mesh/rve/inclusions_file=gold/outside.csv'
+    expect_err = 'Centers must lie in the admissible XY domain'
+    requirement = 'CSV geometry shall reject centers outside the specified domain.'
+  []
+  [invalid_radius]
+    type = RunException
+    input = mesh.i
+    cli_args = '--mesh-only invalid.e Mesh/rve/inclusions_file=gold/invalid_radius.csv'
+    expect_err = 'radii finite and positive'
+    requirement = 'CSV geometry shall reject nonpositive radii.'
+  []
+  [overlap]
+    type = RunException
+    input = mesh.i
+    cli_args = '--mesh-only overlap.e Mesh/rve/inclusions_file=gold/overlap.csv'
+    expect_err = 'Concentric shells overlap'
+    requirement = 'CSV geometry shall reject overlap across a periodic boundary.'
+  []
+[]

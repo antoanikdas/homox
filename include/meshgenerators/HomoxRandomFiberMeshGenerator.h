@@ -32,4 +32,6 @@ protected:
   const SubdomainName _matrix_block_name;
   const SubdomainName _fiber_block_name;
   unsigned int _number_of_fibers;
+  std::vector<Point> _file_centers;
+  std::vector<Real> _fiber_radii;
 };

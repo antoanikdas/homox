@@ -17,9 +17,11 @@ InputParameters
 HomoxRandomConcentricFiberMeshGenerator::validParams()
 {
   InputParameters params = MeshGenerator::validParams();
-  params.addRequiredRangeCheckedParam<Real>("radius", "radius > 0", "Fiber radius");
-  params.addRequiredRangeCheckedParam<unsigned int>(
+  params.addRangeCheckedParam<Real>("radius", "radius > 0", "Common fiber radius without CSV input");
+  params.addRangeCheckedParam<unsigned int>(
       "number_of_fibers", "number_of_fibers > 0", "Number of fibers in one RVE");
+  params.addParam<FileName>("inclusions_file", "CSV file with x,y,radius headers; replaces random placement");
+  params.addParam<std::vector<Real>>("fiber_radii", {}, "Optional individual radii for explicit centers");
   params.addParam<Real>("xmin", 0, "Minimum x coordinate");
   params.addParam<Real>("xmax", 1, "Maximum x coordinate");
   params.addParam<Real>("ymin", 0, "Minimum y coordinate");
@@ -64,8 +66,10 @@ HomoxRandomConcentricFiberMeshGenerator::HomoxRandomConcentricFiberMeshGenerator
   : MeshGenerator(parameters)
 {
   declareMeshProperty("use_distributed_mesh", false);
-  const auto centers = HomoxFiberPlacement::concentricCenters(parameters);
-  const Real radius = getParam<Real>("radius");
+  const auto geometry_parameters = HomoxFiberPlacement::geometryParameters(parameters, validParams());
+  const auto centers = HomoxFiberPlacement::concentricCenters(geometry_parameters);
+  const auto radii = HomoxFiberPlacement::radii(geometry_parameters);
+  const Real radius = *std::max_element(radii.begin(), radii.end());
   const bool periodic = getParam<bool>("periodic_geometry");
   const Real xmin = getParam<Real>("xmin"), xmax = getParam<Real>("xmax");
   const Real ymin = getParam<Real>("ymin"), ymax = getParam<Real>("ymax");
@@ -99,10 +103,12 @@ HomoxRandomConcentricFiberMeshGenerator::HomoxRandomConcentricFiberMeshGenerator
         image_centers.push_back(center + Point(ix * width, iy * height));
   for (unsigned int i = 0; i < image_centers.size(); ++i)
   {
+    const Real fiber_radius = radii[i % centers.size()];
     const MeshGeneratorName disk = name() + "_disk_" + std::to_string(i);
     auto disk_params = _app.getFactory().getValidParams("ConcentricCircleMeshGenerator");
     disk_params.set<unsigned int>("num_sectors") = sectors;
-    disk_params.set<std::vector<Real>>("radii") = {radius, outer_radius};
+    disk_params.set<std::vector<Real>>("radii") =
+        {fiber_radius, fiber_radius + getParam<Real>("matrix_shell_thickness")};
     disk_params.set<std::vector<unsigned int>>("rings") =
         {getParam<unsigned int>("fiber_rings"), getParam<unsigned int>("matrix_rings")};
     disk_params.set<bool>("has_outer_square") = false;

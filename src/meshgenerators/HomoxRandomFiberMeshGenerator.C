@@ -1,6 +1,7 @@
 #include "HomoxRandomFiberMeshGenerator.h"
 
 #include "MooseRandom.h"
+#include "HomoxFiberPlacement.h"
 
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
@@ -18,8 +19,10 @@ HomoxRandomFiberMeshGenerator::validParams()
   params.set<MooseEnum>("dim") = "2";
   params.set<MooseEnum>("elem_type") = "QUAD4";
 
-  params.addRequiredRangeCheckedParam<Real>(
+  params.addRangeCheckedParam<Real>(
       "radius", "radius > 0", "Common radius of the circular fibers");
+  params.addParam<FileName>("inclusions_file", "CSV file with x,y,radius headers");
+  params.addParam<std::vector<Real>>("fiber_radii", {}, "Optional individual radii for explicit centers");
   params.addParam<unsigned int>(
       "number_of_fibers", "Number of fibers; specify this or volume_fraction");
   params.addParam<Real>(
@@ -52,7 +55,7 @@ HomoxRandomFiberMeshGenerator::validParams()
 HomoxRandomFiberMeshGenerator::HomoxRandomFiberMeshGenerator(
     const InputParameters & parameters)
   : GeneratedMeshGenerator(parameters),
-    _radius(getParam<Real>("radius")),
+    _radius(isParamValid("radius") ? getParam<Real>("radius") : 0),
     _minimum_spacing(getParam<Real>("minimum_spacing")),
     _periodic_geometry(getParam<bool>("periodic_geometry")),
     _seed(getParam<unsigned int>("seed")),
@@ -70,8 +73,24 @@ HomoxRandomFiberMeshGenerator::HomoxRandomFiberMeshGenerator(
 
   const Real width = _xmax - _xmin;
   const Real height = _ymax - _ymin;
-  if (width <= 0.0 || height <= 0.0)
+  if (!std::isfinite(_xmin) || !std::isfinite(_xmax) || !std::isfinite(_ymin) ||
+      !std::isfinite(_ymax) || width <= 0.0 || height <= 0.0)
     paramError("xmax", "The RVE must have positive width and height.");
+  if (isParamValid("inclusions_file") && !getParam<FileName>("inclusions_file").empty())
+  {
+    if (isParamValid("volume_fraction"))
+      paramError("volume_fraction", "Do not specify volume_fraction with inclusions_file.");
+    const auto geometry_parameters = HomoxFiberPlacement::geometryParameters(parameters, validParams());
+    _file_centers = geometry_parameters.get<std::vector<Point>>("fiber_centers");
+    _fiber_radii = HomoxFiberPlacement::radii(geometry_parameters);
+    _number_of_fibers = _file_centers.size();
+    for (const Real radius : _fiber_radii)
+      if (2 * radius >= std::min(width, height))
+        paramError("inclusions_file", "Each fiber diameter must be smaller than both RVE dimensions.");
+    return;
+  }
+  if (!isParamValid("radius"))
+    paramError("radius", "Supply radius or inclusions_file.");
   if (2.0 * _radius >= std::min(width, height))
     paramError("radius", "The fiber diameter must be smaller than both RVE dimensions.");
 
@@ -97,6 +116,17 @@ HomoxRandomFiberMeshGenerator::HomoxRandomFiberMeshGenerator(
       paramError("volume_fraction",
                  "The requested volume fraction and radius produce fewer than one fiber.");
   }
+  _fiber_radii = getParam<std::vector<Real>>("fiber_radii");
+  if (_fiber_radii.empty())
+    _fiber_radii.assign(_number_of_fibers, _radius);
+  if (_fiber_radii.size() != _number_of_fibers)
+    paramError("fiber_radii", "Supply one radius per fiber.");
+  for (const Real radius : _fiber_radii)
+    if (!std::isfinite(radius) || radius <= 0 || 2 * radius >= std::min(width, height))
+      paramError("fiber_radii", "Radii must be finite, positive, and smaller than half the RVE dimensions.");
+  if (!getParam<std::vector<Real>>("fiber_radii").empty() &&
+      getParam<std::vector<Point>>("fiber_centers").empty())
+    paramError("fiber_radii", "Individual radii require explicit fiber_centers or inclusions_file.");
 }
 
 Real
@@ -115,23 +145,26 @@ HomoxRandomFiberMeshGenerator::squaredDistance(const Point & first, const Point 
 std::vector<Point>
 HomoxRandomFiberMeshGenerator::generateFiberCenters() const
 {
-  const auto & explicit_centers = getParam<std::vector<Point>>("fiber_centers");
+  const auto & explicit_centers = _file_centers.empty() ? getParam<std::vector<Point>>("fiber_centers")
+                                                      : _file_centers;
   if (!explicit_centers.empty())
   {
     if (explicit_centers.size() != _number_of_fibers)
       paramError("fiber_centers", "Supply one center per requested fiber.");
-    const Real minimum_distance = 2.0 * _radius + _minimum_spacing;
     for (unsigned int i = 0; i < explicit_centers.size(); ++i)
     {
       const auto & center = explicit_centers[i];
-      const Real margin = _periodic_geometry ? 0.0 : _radius;
+      const Real margin = _periodic_geometry ? 0.0 : _fiber_radii[i];
       if (!std::isfinite(center(0)) || !std::isfinite(center(1)) || center(2) != 0 ||
           center(0) < _xmin + margin || center(0) >= _xmax - margin ||
           center(1) < _ymin + margin || center(1) >= _ymax - margin)
         paramError("fiber_centers", "Centers must lie in the admissible XY domain.");
       for (unsigned int j = 0; j < i; ++j)
+      {
+        const Real minimum_distance = _fiber_radii[i] + _fiber_radii[j] + _minimum_spacing;
         if (squaredDistance(center, explicit_centers[j]) < minimum_distance * minimum_distance)
           paramError("fiber_centers", "Fibers overlap or violate minimum_spacing.");
+      }
     }
     return explicit_centers;
   }
@@ -188,8 +221,8 @@ HomoxRandomFiberMeshGenerator::generate()
   {
     const Point centroid = element->vertex_average();
     bool in_fiber = false;
-    for (const auto & center : centers)
-      if (squaredDistance(centroid, center) <= _radius * _radius)
+    for (std::size_t i = 0; i < centers.size(); ++i)
+      if (squaredDistance(centroid, centers[i]) <= _fiber_radii[i] * _fiber_radii[i])
       {
         in_fiber = true;
         break;

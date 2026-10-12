@@ -26,14 +26,19 @@ HomoxRandomFiberRVEMeshGenerator::HomoxRandomFiberRVEMeshGenerator(
   : MeshGenerator(parameters)
 {
   declareMeshProperty("use_distributed_mesh", false);
-  const auto centers = HomoxFiberPlacement::concentricCenters(parameters);
+  const auto geometry_parameters = HomoxFiberPlacement::geometryParameters(parameters, validParams());
+  const auto centers = HomoxFiberPlacement::concentricCenters(geometry_parameters);
+  const auto radii = HomoxFiberPlacement::radii(geometry_parameters);
   declareMeshProperty("fiber_centers", centers);
+  declareMeshProperty("fiber_radii", radii);
   const bool structured = getParam<MooseEnum>("mesh_type") == "structured";
   const std::string generator_type = structured ? "HomoxRandomFiberMeshGenerator"
                                                : "HomoxRandomConcentricFiberMeshGenerator";
   auto child = _app.getFactory().getValidParams(generator_type);
-  child.applyParameters(parameters);
+  child.applyParameters(geometry_parameters);
+  child.set<FileName>("inclusions_file") = "";
   child.set<std::vector<Point>>("fiber_centers") = centers;
+  child.set<std::vector<Real>>("fiber_radii") = radii;
   if (structured)
   {
     child.set<SubdomainID>("matrix_block_id") = 2;

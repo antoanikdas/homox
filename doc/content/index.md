@@ -9,3 +9,6 @@ Mechanics module remains disabled.
 
 The [multiple-inclusion mesh generator](source/multi_inclusion_mesh.md) creates configurable
 rectangular arrays of conforming circular-inclusion cells for either formulation.
+
+[CSV fiber meshing](source/csv_fiber_mesh.md) reads inclusion centers and individual radii and
+generates either a structured QUAD4 or fitted TRI3 mesh, with optional periodic wrapping.

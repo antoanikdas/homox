@@ -1,0 +1,34 @@
+[Tests]
+  [concentric_geometry]
+    type = JSONDiff
+    input = geometry.i
+    cli_args = "Outputs/file_base=concentric_geometry Mesh/rve/fiber_centers='' Mesh/rve/number_of_fibers=4 Mesh/rve/seed=1234"
+    jsondiff = concentric_geometry.json
+    requirement = 'The fitted mesh shall retain the requested periodic fiber geometry as mesh metadata.'
+  []
+  [structured_geometry]
+    type = JSONDiff
+    input = geometry.i
+    cli_args = "Mesh/rve/mesh_type=structured Outputs/file_base=structured_geometry Mesh/rve/fiber_centers='' Mesh/rve/number_of_fibers=4 Mesh/rve/seed=1234"
+    jsondiff = structured_geometry.json
+    requirement = 'Switching to structured meshing shall preserve exactly the same fiber geometry metadata.'
+  []
+  [concentric]
+    type = Exodiff
+    input = mesh.i
+    cli_args = '--mesh-only concentric.e'
+    exodiff = concentric.e
+    exodiff_opts = '-pedantic -match_by_name'
+    recover = false
+    requirement = 'The application shall provide a selectable fitted periodic random-fiber mesh.'
+  []
+  [structured]
+    type = Exodiff
+    input = mesh.i
+    cli_args = '--mesh-only structured.e Mesh/rve/mesh_type=structured'
+    exodiff = structured.e
+    exodiff_opts = '-pedantic -match_by_name'
+    recover = false
+    requirement = 'The application shall provide a structured representation of the same specified periodic fiber centers and radii.'
+  []
+[]

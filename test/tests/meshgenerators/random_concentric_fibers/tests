@@ -1,0 +1,52 @@
+[Tests]
+  [periodic_crossing_fibers]
+    type = Exodiff
+    input = periodic.i
+    cli_args = '--mesh-only'
+    exodiff = periodic_in.e
+    exodiff_opts = '-pedantic -match_by_name'
+    recover = false
+    requirement = 'The application shall generate fitted periodic fibers crossing all four RVE boundaries, including corner wrapping, with an all-TRI3 conforming mesh.'
+  []
+  [periodic_elastic_recovery]
+    type = CSVDiff
+    input = periodic_elastic.i
+    cli_args = 'BCs/pin_origin_x/boundary=bottom_left BCs/pin_origin_y/boundary=bottom_left BCs/remove_rotation/boundary=bottom_right Outputs/exodus=false Outputs/file_base=periodic_elastic_out'
+    csvdiff = periodic_elastic_out.csv
+    recover = false
+    requirement = 'The application shall recover the exact homogeneous plane-strain stiffness using periodic homogenization on a mesh with fitted fibers crossing the RVE edges and corner.'
+  []
+  [periodic_overlap_rejected]
+    type = RunException
+    input = periodic.i
+    cli_args = "--mesh-only Mesh/fibers/number_of_fibers=2 Mesh/fibers/fiber_centers='0.02 0.5 0 0.98 0.5 0'"
+    expect_err = 'Concentric shells overlap or violate minimum_spacing'
+    recover = false
+    requirement = 'The application shall reject fiber shells that overlap across a periodic boundary.'
+  []
+  [random_concentric_mesh]
+    type = Exodiff
+    input = mesh.i
+    cli_args = '--mesh-only'
+    exodiff = mesh_in.e
+    exodiff_opts = '-pedantic -match_by_name'
+    recover = false
+    requirement = 'The application shall generate a conforming all-TRI3 random concentric fiber mesh with two phase blocks and matching opposite boundaries.'
+  []
+  [invalid_sectors]
+    type = RunException
+    input = mesh.i
+    cli_args = '--mesh-only Mesh/fibers/num_sectors=3'
+    expect_err = 'The number of sectors must be even'
+    recover = false
+    requirement = 'The application shall reject odd sector counts for concentric fiber generation.'
+  []
+  [impossible_packing]
+    type = RunException
+    input = mesh.i
+    cli_args = '--mesh-only Mesh/fibers/number_of_fibers=100 Mesh/fibers/max_placement_attempts=100'
+    expect_err = 'Unable to place requested concentric fibers'
+    recover = false
+    requirement = 'The application shall report unsuccessful concentric fiber placement rather than generate overlapping shells.'
+  []
+[]

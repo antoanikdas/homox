@@ -1,0 +1,11 @@
+[Tests]
+  [periodic_structured_random_fibers]
+    type = Exodiff
+    input = random_fibers.i
+    cli_args = '--mesh-only'
+    exodiff = random_fibers_in.e
+    exodiff_opts = '-pedantic -match_by_name'
+    recover = false
+    requirement = 'The application shall reproducibly generate a structured periodic random-fiber RVE with matrix and fiber blocks.'
+  []
+[]

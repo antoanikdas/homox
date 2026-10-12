@@ -16,6 +16,8 @@ EXECUTABLE = DIRECTORY.parents[3] / "homox-opt"
 RUN_CASES = True
 MODES = ("concentric", "structured")
 CASES = (("inplane", "xx"), ("inplane", "yy"), ("inplane", "xy"),
+         ("axial", "axial_xx"), ("axial", "axial_yy"),
+         ("axial", "axial_xy"), ("axial", "axial_zz"),
          ("antiplane", "xz"), ("antiplane", "yz"))
 
 
@@ -44,6 +46,19 @@ def reconstruct(rows):
     traction = np.column_stack([[rows[c]["tau_xz"], rows[c]["tau_yz"]]
                                 for c in ("xz", "yz")])
     return np.linalg.solve(strain.T, stress.T).T, np.linalg.solve(gradient.T, traction.T).T
+
+
+def reconstruct_full(rows, antiplane):
+    cases = ("axial_xx", "axial_yy", "axial_zz", "axial_xy")
+    strain = np.column_stack([[rows[c]["exx"], rows[c]["eyy"], rows[c]["ezz"],
+                               2*rows[c]["exy"]] for c in cases])
+    stress = np.column_stack([[rows[c]["sxx"], rows[c]["syy"], rows[c]["szz"],
+                               rows[c]["sxy"]] for c in cases])
+    block = np.linalg.solve(strain.T, stress.T).T
+    full = np.zeros((6, 6))
+    full[np.ix_([0, 1, 2, 5], [0, 1, 2, 5])] = block
+    full[np.ix_([4, 3], [4, 3])] = antiplane
+    return full
 
 
 def main():
@@ -82,9 +97,13 @@ def main():
                            float(nonlinear[-1][1]))
 
         C, K = reconstruct(rows)
+        full = reconstruct_full(rows, K)
+        recovered_inplane = full[np.ix_([0, 1, 5], [0, 1, 5])]
+        if not np.allclose(recovered_inplane, C, atol=1e-8, rtol=1e-10):
+            raise RuntimeError("The generalized-plane-strain extension changed the original in-plane response")
         fraction = rows["xx"]["fiber_area"] / rows["xx"]["area"]
         checks = {}
-        for name, matrix in (("C", C), ("K", K)):
+        for name, matrix in (("C", C), ("K", K), ("full", full)):
             asymmetry = np.linalg.norm(matrix - matrix.T) / np.linalg.norm(matrix)
             eigenvalues = np.linalg.eigvalsh(0.5 * (matrix + matrix.T))
             if asymmetry > 1e-8 or eigenvalues.min() <= 0:
@@ -99,20 +118,27 @@ def main():
                   np.linalg.eigvalsh(40*voigt_factor*np.eye(2) - 0.5*(K+K.T)).min())
         if min(bounds) < -1e-8:
             raise RuntimeError(f"The {mode} matrices violate Voigt-Reuss bounds")
+        phase_full = np.diag([80., 80., 80., 40., 40., 40.])
+        phase_full[:3, :3] += 40
+        full_symmetric = 0.5*(full + full.T)
+        if min(np.linalg.eigvalsh(full_symmetric - reuss_factor*phase_full).min(),
+               np.linalg.eigvalsh(voigt_factor*phase_full - full_symmetric).min()) < -1e-8:
+            raise RuntimeError(f"The {mode} full stiffness violates Voigt-Reuss bounds")
         energy_errors = {}
         for formulation, case in CASES:
             row = rows[case]
             if not np.isclose(row["fiber_area"] / row["area"], fraction, atol=1e-12):
                 raise RuntimeError("Geometry differs between load cases")
-            if formulation == "inplane":
+            if formulation in ("inplane", "axial"):
                 macro = 0.5 * (row["sxx"]*row["exx"] + row["syy"]*row["eyy"]
-                               + 2*row["sxy"]*row["exy"])
+                               + 2*row["sxy"]*row["exy"]
+                               + row.get("szz", 0)*row.get("ezz", 0))
             else:
                 macro = 0.5 * (row["tau_xz"]*row["gamma_xz"] + row["tau_yz"]*row["gamma_yz"])
             energy_errors[case] = abs(row["energy"] / row["area"] - macro) / abs(macro)
             if energy_errors[case] > 1e-8:
                 raise RuntimeError(f"Energy consistency check failed for {mode}/{case}")
-        results[mode] = dict(C=C, K=K, fraction=fraction, rows=rows, stats=stats,
+        results[mode] = dict(C=C, K=K, full=full, fraction=fraction, rows=rows, stats=stats,
                              checks=checks, bounds=bounds, energy_errors=energy_errors)
 
     reference, structured = results["concentric"], results["structured"]
@@ -178,7 +204,7 @@ def main():
               "| Mesh | Matrix | Relative symmetry error | Eigenvalues |",
               "| --- | --- | ---: | --- |"]
     for mode in MODES:
-        for key in ("C", "K"):
+        for key in ("C", "K", "full"):
             asymmetry, eigenvalues = results[mode]["checks"][key]
             lines.append(f"| {mode} | {key} | {asymmetry:.3e} | "
                          + ", ".join(f"{value:.6f}" for value in eigenvalues) + " |")
@@ -189,11 +215,42 @@ def main():
               "Results, Exodus files, and solver logs are separated under `results/concentric`",
               "and `results/structured`. The script uses the saved meshes one directory above.",
               "Set `RUN_CASES = False` to rebuild this report from existing results."]
+    full_error = np.linalg.norm(structured["full"] - reference["full"]) / np.linalg.norm(reference["full"])
+    lines += ["", "## Axial Extension and Full 3D Stiffness", "",
+              "The `axial` inputs activate four macro-strain scalars (xx, xy, yy, zz).",
+              "For axial_zz, epsilon_zz=0.01 and all other average strains are zero.",
+              "For axial_xx, axial_yy, and axial_xy, epsilon_zz remains zero while sigma_zz",
+              "is measured. This independently verifies reciprocal axial couplings.",
+              "The 2D material adds uniform epsilon_zz to its full 3D strain tensor;",
+              "in-plane periodic fluctuations are still solved on the cross-sectional mesh.", "",
+              "The assembled full tensor uses stress=(xx, yy, zz, yz, xz, xy) and",
+              "engineering strain=(epsilon_xx, epsilon_yy, epsilon_zz, gamma_yz, gamma_xz, gamma_xy).",
+              "Its 4-by-4 normal/in-plane-shear block is measured from four independent solves.",
+              "The 2-by-2 antiplane block is measured from xz and yz. Cross-block entries",
+              "are zero by z-reflection symmetry for straight, z-invariant isotropic phases.",
+              "This assembly is not a general recovery method for arbitrarily anisotropic",
+              "phases with normal/antiplane coupling or a geometry varying along z.", ""]
+    for mode in MODES:
+        lines += [f"Full C_eff, {mode}:", "", matrix_text(results[mode]["full"]), ""]
+    lines += [f"Relative full-matrix Frobenius difference: **{100*full_error:.6f}%**.", "",
+              "| Axial component | Concentric | Structured | Relative difference |",
+              "| --- | ---: | ---: | ---: |"]
+    for name, i, j in (("C13", 0, 2), ("C23", 1, 2), ("C33", 2, 2), ("C36", 2, 5)):
+        first, second = reference["full"][i, j], structured["full"][i, j]
+        lines.append(f"| {name} | {first:.9f} | {second:.9f} | {100*abs(second-first)/abs(first):.6f}% |")
+    lines += ["", "The full matrices are symmetric to numerical precision and positive definite.",
+              "Their in-plane submatrices reproduce the original plane-strain matrices.",
+              "Full 3D Voigt-Reuss bounds and energy consistency, including sigma_zz*epsilon_zz,",
+              "were checked. The tensor has 13 potentially independent entries under this",
+              "symmetry; equal phase Poisson ratios introduce additional relations."]
     (DIRECTORY / "RESULTS.md").write_text("\n".join(lines) + "\n")
     np.set_printoptions(precision=9, suppress=True)
     for mode in MODES:
         print(mode, "C_eff:\n", results[mode]["C"], "\nK_eff:\n", results[mode]["K"])
     print(f"C difference: {100*C_error:.6f}%; K difference: {100*K_error:.6f}%")
+    for mode in MODES:
+        print(mode, "full C_eff:\n", results[mode]["full"])
+    print(f"Full C difference: {100*full_error:.6f}%")
     print("Report:", DIRECTORY / "RESULTS.md")
 
 

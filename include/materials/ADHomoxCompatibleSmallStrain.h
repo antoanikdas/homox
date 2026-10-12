@@ -15,6 +15,7 @@ protected:
   void computeQpProperties() override;
 
   const unsigned int _ndisp;
+  const Real _out_of_plane_strain;
   std::vector<const ADVariableGradient *> _grad_displacements;
   const std::string _base_name;
   ADMaterialProperty<RankTwoTensor> & _total_strain;

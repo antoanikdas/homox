@@ -1,0 +1,36 @@
+[Tests]
+  [nonperiodic_kinematic_axial]
+    type = CSVDiff
+    input = nonperiodic_kinematic.i
+    cli_args = 'Outputs/file_base=nonperiodic_kinematic_axial_out Outputs/exodus=false'
+    csvdiff = nonperiodic_kinematic_axial_out.csv
+    requirement = 'The compatible strain material shall recover the constrained homogeneous axial response with nonperiodic kinematic boundaries.'
+  []
+  [nonperiodic_mixed_axial]
+    type = CSVDiff
+    input = nonperiodic_mixed.i
+    cli_args = 'Outputs/file_base=nonperiodic_mixed_axial_out Outputs/exodus=false'
+    csvdiff = nonperiodic_mixed_axial_out.csv
+    requirement = 'The compatible strain material shall recover the homogeneous axial response with one constrained transverse direction and one traction-free direction.'
+  []
+  [nonperiodic_static_axial]
+    type = CSVDiff
+    input = nonperiodic_static.i
+    cli_args = 'Outputs/file_base=nonperiodic_static_axial_out Outputs/exodus=false'
+    csvdiff = nonperiodic_static_axial_out.csv
+    requirement = 'The compatible strain material shall recover homogeneous axial extension with traction-free transverse boundaries and rigid-body pins.'
+  []
+  [axial_strain]
+    type = CSVDiff
+    input = axial.i
+    csvdiff = axial_out.csv
+    requirement = 'The two-dimensional homogenization kernels shall recover the exact homogeneous axial stiffness column with a uniform macroscopic zz strain.'
+  []
+  [axial_stress]
+    type = CSVDiff
+    input = axial.i
+    cli_args = "GlobalParams/constraint_types='strain none none strain strain none none none stress' axial_target=1.2 Outputs/file_base=axial_stress_out"
+    csvdiff = axial_stress_out.csv
+    requirement = 'The two-dimensional homogenization kernels shall determine uniform axial strain from a prescribed average zz stress.'
+  []
+[]

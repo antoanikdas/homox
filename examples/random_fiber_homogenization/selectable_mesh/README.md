@@ -79,7 +79,10 @@ The standalone generator names remain available for existing input files.
 
 [Results for both representations](homogenization/RESULTS.md) contain the three
 plane-strain and two antiplane periodic load cases, their full effective
-matrices, energy comparisons, and convergence statistics. Matrix E=100 and
+matrices, energy comparisons, and convergence statistics. Four additional
+generalized-plane-strain cases in `homogenization/axial` prescribe the xx, yy,
+xy, and zz macro strains and output sigma_zz, completing the full 6 x 6 tensor
+for the straight isotropic fibers. Matrix E=100 and
 fiber E=1000, with nu=0.25 for both phases. Reproduce with:
 
 ```bash
@@ -89,4 +92,6 @@ python homogenization/run_comparison.py
 At the supplied resolution, the structured matrix differs from the concentric
 matrix by 0.246188% in the in-plane Frobenius norm and 0.157290% in the antiplane
 Frobenius norm. Both matrices are symmetric to numerical precision and positive
-definite, and all ten cases converge in one Newton iteration.
+definite, and all eighteen cases converge in one Newton iteration. The full
+6 x 6 matrices differ by 0.195658% in the Frobenius norm; the report includes
+C13, C23, C33, C36, reciprocal-coupling checks, and full-tensor eigenvalues.
